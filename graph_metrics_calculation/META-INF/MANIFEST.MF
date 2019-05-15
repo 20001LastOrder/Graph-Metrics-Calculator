@@ -5,3 +5,8 @@ Bundle-SymbolicName: graph_metrics_calculation
 Bundle-Version: 1.0.0.qualifier
 Automatic-Module-Name: graph_metrics_calculation
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: com.google.guava,
+ org.eclipse.xtext.xbase.lib,
+ org.eclipse.xtend.lib,
+ org.eclipse.xtend.lib.macro,
+ org.eclipse.emf.ecore;bundle-version="2.17.0"
