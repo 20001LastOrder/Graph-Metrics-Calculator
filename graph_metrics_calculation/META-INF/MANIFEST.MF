@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Graph_metrics_calculation
+Bundle-SymbolicName: graph_metrics_calculation
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: graph_metrics_calculation
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
