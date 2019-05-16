@@ -9,7 +9,7 @@ import glob
 # as matrix with the first row of values and second row of count
 #
 def readcsvfile(filename):
-    print(filename)
+    # print(filename)
     with open(filename) as f:
         for i, line in enumerate(f):
             if i == 2:
@@ -20,16 +20,16 @@ def readcsvfile(filename):
                 mpcCols = len(f.readline().split(','))
 
     f.close()
-    print(outDegreeCols, naCols, mpcCols)
+    # print(outDegreeCols, naCols, mpcCols)
 
     outdegree = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=3, skip_footer=4, usecols=range(1, outDegreeCols))
     na = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=5, skip_footer=2,
                               usecols=range(1, naCols))
     mpc = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=7, skip_footer=0,
                               usecols=range(1, mpcCols))
-    print(outdegree)
-    print(na)
-    print(mpc)
+    # print(outdegree)
+    # print(na)
+    # print(mpc)
     return outdegree, na, mpc
 
 
@@ -62,10 +62,10 @@ def getmetrics(filename):
 #
 # read number of files in the given path
 #
-def readmultiplefiles(numberOfFiles):
-    list_of_files = glob.glob('../viatraOutput/*.csv')  # create the list of file
+def readmultiplefiles(dirName, numberOfFiles):
+    list_of_files = glob.glob(dirName + '*.csv')  # create the list of file
     file_names = list_of_files[:numberOfFiles]
-    print(file_names)
+    # print(file_names)
     return file_names
 
 
@@ -74,7 +74,7 @@ def plotlines(x, y, ax):
 
 
 def testgetsamplesfromfiles():
-    files = readmultiplefiles(2)
+    files = readmultiplefiles('../viatraOutput/', 2)
     for file in files:
         getmetrics(file)
 
@@ -100,7 +100,7 @@ def plot():
     fig, ax3 = plt.subplots()
     fig, ax4 = plt.subplots()
     fig, ax5 = plt.subplots()
-    list_of_files = readmultiplefiles()
+    list_of_files = readmultiplefiles('../viatraOutput/')
     for file_name in list_of_files:
         outdegree, na, mpc = readcsvfile(file_name)
         outV = outdegree[0, :]
