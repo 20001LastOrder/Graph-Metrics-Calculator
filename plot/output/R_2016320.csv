@@ -1,0 +1,9 @@
+Meta Mode,yakindumm
+Number of Edge types,6
+Number Of Nodes,56
+OutDegreeValue,1,2,3,4,5,7,8,9
+OutDegreeCount,4,39,2,2,1,1,5,2
+NAValue,1,2,3,4,5
+NACount,1,2,5,39,9
+MPCValue,0.00000,0.26250,0.33333,0.76800,0.80000,0.86667,0.90000,0.92410,0.93010,0.93061,0.94815
+MPCCount,1,1,1,1,4,1,38,2,5,1,1
