@@ -3,6 +3,7 @@ package input;
 import graph.EMFGraph;
 import hu.bme.mit.inf.dslreasoner.workspace.FileSystemWorkspace;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +11,12 @@ import metrics.Metric;
 import metrics.MultiplexParticipationCoefficientMetric;
 import metrics.NodeActivityMetric;
 import metrics.OutDegreeMetric;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
@@ -20,6 +25,8 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 
 @SuppressWarnings("all")
 public class GraphReader {
+  private static final ResourceSet resSet = new ResourceSetImpl();
+  
   public static void init() {
     Map<String, Object> _extensionToFactoryMap = Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap();
     XMIResourceFactoryImpl _xMIResourceFactoryImpl = new XMIResourceFactoryImpl();
@@ -50,9 +57,11 @@ public class GraphReader {
       for (final String name : _filter) {
         {
           final File file = new File(name);
-          final EObject model = workspace.<EObject>readModel(EObject.class, file.getName());
+          final List<EObject> roots = GraphReader.<EObject>readModel(EObject.class, path, file.getName());
           final EMFGraph g = new EMFGraph();
-          g.init(model, metrics, name.replaceFirst(".xmi", ""));
+          for (final EObject root : roots) {
+            g.init(root, metrics, name.replaceFirst(".xmi", ""));
+          }
           graphs.add(g);
         }
       }
@@ -60,5 +69,38 @@ public class GraphReader {
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }
+  }
+  
+  public static <RootType extends EObject> List<RootType> readModel(final Class<RootType> type, final String path, final String name) {
+    try {
+      try {
+        final Resource resource = GraphReader.resSet.getResource(GraphReader.getURI(path, name), true);
+        if ((resource == null)) {
+          String _string = GraphReader.getURI(path, name).toString();
+          throw new FileNotFoundException(_string);
+        } else {
+          EList<EObject> _contents = resource.getContents();
+          return ((List<RootType>) _contents);
+        }
+      } catch (final Throwable _t) {
+        if (_t instanceof Exception) {
+          final Exception e = (Exception)_t;
+          e.printStackTrace();
+          String _string_1 = GraphReader.getURI(path, name).toString();
+          String _plus = (_string_1 + "reason: ");
+          String _message = e.getMessage();
+          String _plus_1 = (_plus + _message);
+          throw new FileNotFoundException(_plus_1);
+        } else {
+          throw Exceptions.sneakyThrow(_t);
+        }
+      }
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  public static URI getURI(final String path, final String name) {
+    return URI.createFileURI(((path + "/") + name));
   }
 }

@@ -21,7 +21,7 @@ class OutDegreeMetric extends Metric {
 		]
 		
 		//convert it into a 2 dimentional array
-		val String[][] datas = newArrayOfSize(3, map.size+1);
+		val String[][] datas = newArrayOfSize(2, map.size+1);
 		datas.get(0).set(0, valueName);
 		datas.get(1).set(0, countName)
 		var count = 1;

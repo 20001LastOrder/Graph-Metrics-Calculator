@@ -3,17 +3,23 @@ package input
 import graph.EMFGraph
 import hu.bme.mit.inf.dslreasoner.workspace.FileSystemWorkspace
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.ArrayList
 import java.util.List
 import metrics.Metric
+import metrics.MultiplexParticipationCoefficientMetric
 import metrics.NodeActivityMetric
 import metrics.OutDegreeMetric
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.resource.ResourceSet
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
-import metrics.MultiplexParticipationCoefficientMetric
+import org.eclipse.emf.common.util.URI
 
 class GraphReader{
+	static val ResourceSet resSet = new ResourceSetImpl();
+	
 	static def void init() {
 		Resource.Factory.Registry.INSTANCE.extensionToFactoryMap.put("*",new XMIResourceFactoryImpl)
 	}
@@ -35,13 +41,33 @@ class GraphReader{
 		//check all files in the directory with xmi
 		for(String name : dir.list.filter[it| it.endsWith(".xmi")]){
 			val file = new File(name);
-			val model = workspace.readModel(EObject, file.name);			
+			val roots = readModel(EObject, path,  file.name);			
 			//add a list of metrics
 			val g = new EMFGraph();
-			g.init(model, metrics, name.replaceFirst(".xmi", ""));
+			for(root : roots){
+				g.init(root, metrics, name.replaceFirst(".xmi", ""));
+			}
+			
 			graphs.add(g);
 		}
 		
 		return graphs;
+	}
+	
+	def static <RootType extends EObject> List<RootType> readModel(Class<RootType> type, String path, String name) {
+		try {
+			val resource = resSet.getResource(getURI(path, name),true);
+			if(resource === null) throw new FileNotFoundException(getURI(path, name).toString)
+			else {		
+				return resource.contents as List<RootType>
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new FileNotFoundException(getURI(path, name).toString + "reason: " + e.message)
+		}
+	}
+	
+	def static getURI(String path, String name) {
+		URI.createFileURI(path + "/"  + name)
 	}
 }

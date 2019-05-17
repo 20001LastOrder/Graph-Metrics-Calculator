@@ -15,27 +15,29 @@ public class Main {
     SocialnetworkPackageImpl.eINSTANCE.eClass();
     YakindummPackageImpl.eINSTANCE.eClass();
     InputOutput.<String>println("Start Reading Models...");
-    final ArrayList<EMFGraph> models = new ArrayList<EMFGraph>();
-    for (int i = 1; (i <= 20); i++) {
+    for (int i = 1; (i <= 10); i++) {
       {
-        models.addAll(GraphReader.readModels((("viatraInput/VS+i/models/" + "run") + Integer.valueOf(i))));
-        models.addAll(GraphReader.readModels((("viatraInput/VS-i/models/" + "run") + Integer.valueOf(i))));
-      }
-    }
-    InputOutput.<String>println("Reading Models Ended");
-    for (final EMFGraph model : models) {
-      {
-        String _name = model.getName();
-        String _plus = ("evaluating for " + _name);
-        InputOutput.<String>println(_plus);
-        model.setMetaModel(YakindummPackageImpl.eNAME);
-        ArrayList<ArrayList<String>> _evaluateAllMetrics = model.evaluateAllMetrics();
-        String _name_1 = model.getName();
-        String _plus_1 = ("viatraOutput/" + _name_1);
-        String _plus_2 = (_plus_1 + ".csv");
-        CsvFileWriter.write(_evaluateAllMetrics, _plus_2);
+        final ArrayList<EMFGraph> models = new ArrayList<EMFGraph>();
+        models.addAll(GraphReader.readModels((("viatraInput/" + "run") + Integer.valueOf(i))));
+        InputOutput.<String>println("Reading Models Ended");
+        for (final EMFGraph model : models) {
+          String _name = model.getName();
+          String _plus = ("viatraOutput/" + _name);
+          String _plus_1 = (_plus + "_run_");
+          String _plus_2 = (_plus_1 + Integer.valueOf(i));
+          String _plus_3 = (_plus_2 + ".csv");
+          Main.calculateAndOutputMetrics(model, YakindummPackageImpl.eNAME, _plus_3);
+        }
       }
     }
     InputOutput.<String>println("finished");
+  }
+  
+  public static void calculateAndOutputMetrics(final EMFGraph model, final String metaModel, final String fileName) {
+    String _name = model.getName();
+    String _plus = ("evaluating for " + _name);
+    InputOutput.<String>println(_plus);
+    model.setMetaModel(metaModel);
+    CsvFileWriter.write(model.evaluateAllMetrics(), fileName);
   }
 }

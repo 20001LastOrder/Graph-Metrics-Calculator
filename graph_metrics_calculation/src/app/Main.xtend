@@ -4,6 +4,7 @@ import graph.EMFGraph
 import hu.bme.mit.inf.dslreasoner.domains.yakindu.sgraph.yakindumm.impl.YakindummPackageImpl
 import input.GraphReader
 import java.util.ArrayList
+import java.util.List
 import output.CsvFileWriter
 import socialnetwork.impl.SocialnetworkPackageImpl
 
@@ -15,22 +16,24 @@ class Main {
 		YakindummPackageImpl.eINSTANCE.eClass;
 		
 		println("Start Reading Models...");
-		val models = new ArrayList<EMFGraph>();
 		
-		for(var i = 1; i <= 20; i++){
-			models.addAll(GraphReader.readModels("viatraInput/VS+i/models/" + "run"+i));
-			models.addAll(GraphReader.readModels("viatraInput/VS-i/models/" + "run"+i));
+		for(var i = 1; i <= 10; i++){
+			val models = new ArrayList<EMFGraph>();
+//			models.addAll(GraphReader.readModels("viatraInput/VS+i/models/" + "run"+i));
+//			models.addAll(GraphReader.readModels("viatraInput/VS-i/models/" + "run"+i));
+			models.addAll(GraphReader.readModels("viatraInput/" + "run" + i));
+			println("Reading Models Ended")
+			for(model : models){
+				calculateAndOutputMetrics(model, YakindummPackageImpl.eNAME, "viatraOutput/"+model.name+"_run_"+i+".csv");
+			}
 		}
-		
-		
-		
-		println("Reading Models Ended")
-		
-		for(model : models){
-			println("evaluating for " + model.name);
-			model.metaModel = YakindummPackageImpl.eNAME;
-			CsvFileWriter.write(model.evaluateAllMetrics(), "viatraOutput/"+model.name+".csv");
-		}
+
 		println("finished");
+	}
+	
+	static def calculateAndOutputMetrics(EMFGraph model, String metaModel, String fileName){
+		println("evaluating for " + model.name);
+		model.metaModel = metaModel;
+		CsvFileWriter.write(model.evaluateAllMetrics(), fileName);
 	}
 }

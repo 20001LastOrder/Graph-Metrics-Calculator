@@ -22,6 +22,8 @@ public class EMFGraph {
   
   private String metaModel;
   
+  private EObject root;
+  
   private static final String META_MODEL_HEADER = "Meta Mode";
   
   private static final String NUM_NODE_HEADER = "Number Of Nodes";

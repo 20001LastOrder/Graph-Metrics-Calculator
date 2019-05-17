@@ -34,7 +34,7 @@ public class OutDegreeMetric extends Metric {
     g.getAllNodes().forEach(_function);
     int _size = map.size();
     int _plus = (_size + 1);
-    final String[][] datas = new String[3][_plus];
+    final String[][] datas = new String[2][_plus];
     datas[0][0] = OutDegreeMetric.valueName;
     datas[1][0] = OutDegreeMetric.countName;
     int count = 1;

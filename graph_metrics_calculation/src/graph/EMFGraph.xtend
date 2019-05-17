@@ -12,6 +12,7 @@ class EMFGraph {
 	var List<Metric> metrics;
 	var String name;
 	var String metaModel;
+	var EObject root;
 	
 	static val String META_MODEL_HEADER = "Meta Mode"
 	static val String NUM_NODE_HEADER = "Number Of Nodes";
