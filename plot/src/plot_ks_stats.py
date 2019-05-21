@@ -43,10 +43,10 @@ def calculateMDS(dissimilarities):
     trans = embedding.fit_transform(X=dissimilarities)
     return trans
 
-def plot(graphTypes, coords, title='', savePath = ''):
+def plot(graphTypes, coords, title='',index = 0, savePath = ''):
     half_length = int(coords.shape[0] / len(graphTypes))
     color = ['blue', 'red', 'green']
-    graph = plt.figure(0)
+    plt.figure(index)
     plt.title(title)
     for i in range(len(graphTypes)):
         x = (coords[(i*half_length):((i+1)*half_length), 0].tolist())
@@ -69,7 +69,7 @@ def mkdir_p(mypath):
             pass
         else: raise
 
-def metricStat(graphTypes, metricName, metric):
+def metricStat(graphTypes, metricName, metric, graphIndex):
     metrics = []
     foldName = '../output/'
     for graph in graphTypes:
@@ -78,7 +78,7 @@ def metricStat(graphTypes, metricName, metric):
     print('calculate' + metricName +' for ' + foldName)
     mkdir_p(foldName)
     out_d_coords = calculateMDS(calculateKSMatrix(metrics))
-    plot(graphTypes, out_d_coords, metricName, foldName + '/'+ metricName+'.png')
+    plot(graphTypes, out_d_coords, metricName, graphIndex,foldName + '/'+ metricName+'.png')
 
 def nodeActivity(graphType):
     return graphType.nas
@@ -87,7 +87,7 @@ def outDegree(graphType):
     return graphType.out_ds
 
 def mpc(graphType):
-    return graphType.mpc
+    return graphType.mpcs
 
 
 # read models
@@ -98,6 +98,6 @@ random = GraphType('../statistics/randomOutput/', 500, 'Random')
 alloy = GraphType('../statistics/alloyOutput/', 500, 'Alloy (30 nodes)')
 
 #calculate metrics
-metricStat([human, viatra30, random], 'Node Activity', nodeActivity)
-metricStat([human, viatra30, random], 'Out Degree', outDegree)
-metricStat([human, viatra30, random], 'MPC', mpc)
+# metricStat([human, viatra30, random], 'Node Activity', nodeActivity, 0)
+metricStat([human, viatra30, random], 'Out Degree', outDegree, 1)
+metricStat([human, viatra30, random], 'MPC', mpc, 2)
