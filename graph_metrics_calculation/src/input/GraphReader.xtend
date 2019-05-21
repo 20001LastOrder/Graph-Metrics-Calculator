@@ -1,7 +1,6 @@
 package input
 
 import graph.EMFGraph
-import hu.bme.mit.inf.dslreasoner.workspace.FileSystemWorkspace
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.ArrayList
@@ -10,28 +9,37 @@ import metrics.Metric
 import metrics.MultiplexParticipationCoefficientMetric
 import metrics.NodeActivityMetric
 import metrics.OutDegreeMetric
+import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EPackage
+import org.eclipse.emf.ecore.EReference
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
-import org.eclipse.emf.common.util.URI
 
 class GraphReader{
-	static val ResourceSet resSet = new ResourceSetImpl();
+	val ResourceSet resSet = new ResourceSetImpl();
+	val referenceTypes = new ArrayList<EReference>();
 	
-	static def void init() {
+	new(EPackage metaModel) {
 		Resource.Factory.Registry.INSTANCE.extensionToFactoryMap.put("*",new XMIResourceFactoryImpl)
+		
+		//find all reference types in the meta model
+		metaModel.eAllContents.forEach[
+			if(it instanceof EReference){
+				referenceTypes.add(it);
+			}
+		]
 	}
 	
-	static def List<EMFGraph> readModels(String path){
+	def List<EMFGraph> readModels(String path){
 		val dir = new File(path);
 		if(!dir.isDirectory){
 			throw new Exception("expecting a directory");
 		}
 		
 		val graphs = new ArrayList<EMFGraph>();
-		val workspace = new FileSystemWorkspace(path,"");
 		
 		val metrics = new ArrayList<Metric>();
 		metrics.add(new OutDegreeMetric());
@@ -45,7 +53,7 @@ class GraphReader{
 			//add a list of metrics
 			val g = new EMFGraph();
 			for(root : roots){
-				g.init(root, metrics, name.replaceFirst(".xmi", ""));
+				g.init(root, metrics, name.replaceFirst(".xmi", ""), referenceTypes);
 			}
 			
 			graphs.add(g);
@@ -54,7 +62,7 @@ class GraphReader{
 		return graphs;
 	}
 	
-	def static <RootType extends EObject> List<RootType> readModel(Class<RootType> type, String path, String name) {
+	def <RootType extends EObject> List<RootType> readModel(Class<RootType> type, String path, String name) {
 		try {
 			val resource = resSet.getResource(getURI(path, name),true);
 			if(resource === null) throw new FileNotFoundException(getURI(path, name).toString)

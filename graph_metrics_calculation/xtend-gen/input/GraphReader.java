@@ -1,7 +1,6 @@
 package input;
 
 import graph.EMFGraph;
-import hu.bme.mit.inf.dslreasoner.workspace.FileSystemWorkspace;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -14,6 +13,8 @@ import metrics.OutDegreeMetric;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
@@ -22,18 +23,28 @@ import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.IteratorExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 
 @SuppressWarnings("all")
 public class GraphReader {
-  private static final ResourceSet resSet = new ResourceSetImpl();
+  private final ResourceSet resSet = new ResourceSetImpl();
   
-  public static void init() {
+  private final ArrayList<EReference> referenceTypes = new ArrayList<EReference>();
+  
+  public GraphReader(final EPackage metaModel) {
     Map<String, Object> _extensionToFactoryMap = Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap();
     XMIResourceFactoryImpl _xMIResourceFactoryImpl = new XMIResourceFactoryImpl();
     _extensionToFactoryMap.put("*", _xMIResourceFactoryImpl);
+    final Procedure1<EObject> _function = (EObject it) -> {
+      if ((it instanceof EReference)) {
+        this.referenceTypes.add(((EReference)it));
+      }
+    };
+    IteratorExtensions.<EObject>forEach(metaModel.eAllContents(), _function);
   }
   
-  public static List<EMFGraph> readModels(final String path) {
+  public List<EMFGraph> readModels(final String path) {
     try {
       final File dir = new File(path);
       boolean _isDirectory = dir.isDirectory();
@@ -42,7 +53,6 @@ public class GraphReader {
         throw new Exception("expecting a directory");
       }
       final ArrayList<EMFGraph> graphs = new ArrayList<EMFGraph>();
-      final FileSystemWorkspace workspace = new FileSystemWorkspace(path, "");
       final ArrayList<Metric> metrics = new ArrayList<Metric>();
       OutDegreeMetric _outDegreeMetric = new OutDegreeMetric();
       metrics.add(_outDegreeMetric);
@@ -57,10 +67,10 @@ public class GraphReader {
       for (final String name : _filter) {
         {
           final File file = new File(name);
-          final List<EObject> roots = GraphReader.<EObject>readModel(EObject.class, path, file.getName());
+          final List<EObject> roots = this.<EObject>readModel(EObject.class, path, file.getName());
           final EMFGraph g = new EMFGraph();
           for (final EObject root : roots) {
-            g.init(root, metrics, name.replaceFirst(".xmi", ""));
+            g.init(root, metrics, name.replaceFirst(".xmi", ""), this.referenceTypes);
           }
           graphs.add(g);
         }
@@ -71,10 +81,10 @@ public class GraphReader {
     }
   }
   
-  public static <RootType extends EObject> List<RootType> readModel(final Class<RootType> type, final String path, final String name) {
+  public <RootType extends EObject> List<RootType> readModel(final Class<RootType> type, final String path, final String name) {
     try {
       try {
-        final Resource resource = GraphReader.resSet.getResource(GraphReader.getURI(path, name), true);
+        final Resource resource = this.resSet.getResource(GraphReader.getURI(path, name), true);
         if ((resource == null)) {
           String _string = GraphReader.getURI(path, name).toString();
           throw new FileNotFoundException(_string);

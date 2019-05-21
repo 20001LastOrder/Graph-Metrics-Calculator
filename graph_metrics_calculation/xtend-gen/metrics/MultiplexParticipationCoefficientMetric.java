@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import metrics.Metric;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
+import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 
 @SuppressWarnings("all")
@@ -39,19 +40,22 @@ public class MultiplexParticipationCoefficientMetric extends Metric {
       }
       coef = (1 - coef);
       coef = ((coef * typeCounts) / (typeCounts - 1));
+      if ((typeCounts == 1)) {
+        InputOutput.<String>println("bad");
+      }
       boolean _isNaN = Double.isNaN(coef);
-      boolean _not = (!_isNaN);
+      if (_isNaN) {
+        coef = 0;
+      }
+      final String value = formatter.format(coef);
+      boolean _containsKey = map.containsKey(value);
+      boolean _not = (!_containsKey);
       if (_not) {
-        final String value = formatter.format(coef);
-        boolean _containsKey = map.containsKey(value);
-        boolean _not_1 = (!_containsKey);
-        if (_not_1) {
-          map.put(value, Integer.valueOf(1));
-        } else {
-          Integer _get = map.get(value);
-          int _plus = ((_get).intValue() + 1);
-          map.put(value, Integer.valueOf(_plus));
-        }
+        map.put(value, Integer.valueOf(1));
+      } else {
+        Integer _get = map.get(value);
+        int _plus = ((_get).intValue() + 1);
+        map.put(value, Integer.valueOf(_plus));
       }
     };
     g.getAllNodes().forEach(_function);

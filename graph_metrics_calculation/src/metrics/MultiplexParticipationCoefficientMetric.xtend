@@ -30,16 +30,22 @@ class MultiplexParticipationCoefficientMetric extends Metric {
 			coef = coef * typeCounts / (typeCounts-1);
 			
 			//Consider the case that either typeCounts-1 or the edgeCounts could be 0 in some situation
-			//omit the value in this case
-			if(!Double.isNaN(coef)){
-				//format number to String
-				val value = formatter.format(coef);
-				if(!map.containsKey(value)){
-					map.put(value, 1);
-				}else{
-					map.put(value, map.get(value) + 1);
-				}		
+			//in this case the metric should be evaluated to 0
+			if(typeCounts == 1){
+				println("bad");
 			}
+			
+			if(Double.isNaN(coef)){
+				coef = 0;
+			}
+			
+			//format number to String
+			val value = formatter.format(coef);
+			if(!map.containsKey(value)){
+				map.put(value, 1);
+			}else{
+				map.put(value, map.get(value) + 1);
+			}		
 			
 		]
 		

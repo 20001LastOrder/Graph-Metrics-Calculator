@@ -22,45 +22,59 @@ public class EMFGraph {
   
   private String metaModel;
   
-  private EObject root;
-  
   private static final String META_MODEL_HEADER = "Meta Mode";
   
   private static final String NUM_NODE_HEADER = "Number Of Nodes";
   
   private static final String NUM_EDGE_TYPE_HEADER = "Number of Edge types";
   
-  public void init(final EObject root, final List<Metric> metrics, final String name) {
+  public void init(final EObject root, final List<Metric> metrics, final String name, final List<EReference> referenceTypes) {
     final List<EObject> otherContents = IteratorExtensions.<EObject>toList(root.eAllContents());
-    this.init(otherContents, metrics, name);
+    otherContents.add(root);
+    this.init(otherContents, metrics, name, referenceTypes);
   }
   
-  public void init(final List<EObject> objects, final List<Metric> metrics, final String name) {
+  /**
+   * init the graph with all nodes and reference types in the meta model
+   * @param objects: objects in the instance model (exclude root)
+   * @param metrics: metrics to be evaluated
+   * @param name: name of the instance model
+   * @param ReferenceTypes: reference types defined in the meta model
+   */
+  public void init(final List<EObject> objects, final List<Metric> metrics, final String name, final List<EReference> referenceTypes) {
     final Consumer<EObject> _function = (EObject it) -> {
       this.statistic.addNode(it);
     };
     objects.forEach(_function);
-    final Consumer<EObject> _function_1 = (EObject source) -> {
-      final Consumer<EReference> _function_2 = (EReference r) -> {
+    final Consumer<EReference> _function_1 = (EReference it) -> {
+      this.statistic.addType(it.getName());
+    };
+    referenceTypes.forEach(_function_1);
+    final Consumer<EObject> _function_2 = (EObject source) -> {
+      final Consumer<EReference> _function_3 = (EReference r) -> {
         boolean _isMany = r.isMany();
         if (_isMany) {
-          final Consumer<EObject> _function_3 = (EObject target) -> {
+          final Consumer<EObject> _function_4 = (EObject target) -> {
             this.addEdge(source, target, r);
           };
-          this.getNeighbours(source, r).forEach(_function_3);
+          this.getNeighbours(source, r).forEach(_function_4);
         } else {
           Object _eGet = source.eGet(r);
           final EObject target = ((EObject) _eGet);
           this.addEdge(source, target, r);
         }
       };
-      source.eClass().getEAllReferences().forEach(_function_2);
+      source.eClass().getEAllReferences().forEach(_function_3);
     };
-    objects.forEach(_function_1);
+    objects.forEach(_function_2);
     this.metrics = metrics;
     this.name = name;
   }
   
+  /**
+   * evaluate all metrics for this model
+   * return the result as a two dimentional list
+   */
   public ArrayList<ArrayList<String>> evaluateAllMetrics() {
     final ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
     this.setBasicInformation(result);
@@ -76,6 +90,9 @@ public class EMFGraph {
     return result;
   }
   
+  /**
+   * Set basic information for the output
+   */
   private boolean setBasicInformation(final ArrayList<ArrayList<String>> output) {
     boolean _xblockexpression = false;
     {

@@ -6,7 +6,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Exceptions;
-import org.eclipse.xtext.xbase.lib.InputOutput;
 
 @SuppressWarnings("all")
 public class CsvFileWriter {
@@ -16,7 +15,6 @@ public class CsvFileWriter {
     if (_lessEqualsThan) {
       return;
     }
-    InputOutput.<String>println(("Output csv for " + uri));
     try {
       File _file = new File(uri);
       final PrintWriter writer = new PrintWriter(_file);
@@ -36,7 +34,6 @@ public class CsvFileWriter {
       }
       writer.write(output.toString());
       writer.close();
-      InputOutput.<String>println("Output csv finished");
     } catch (final Throwable _t) {
       if (_t instanceof FileNotFoundException) {
         final FileNotFoundException e = (FileNotFoundException)_t;

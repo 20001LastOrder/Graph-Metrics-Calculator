@@ -12,7 +12,7 @@ class CsvFileWriter {
 			return;
 		}
 		
-		println("Output csv for " + uri);
+		//println("Output csv for " + uri);
 		try  {
 			val PrintWriter writer = new PrintWriter(new File(uri));
 			val output = new StringBuilder;
@@ -26,7 +26,7 @@ class CsvFileWriter {
 			
 			writer.write(output.toString());
 			writer.close();
-			println("Output csv finished");
+			//println("Output csv finished");
 		}catch(FileNotFoundException e) {
 			e.printStackTrace();
 		}

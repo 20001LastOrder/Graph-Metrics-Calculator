@@ -1,12 +1,31 @@
 import readCSV as reader
 import glob
+import random 
 from sklearn.manifold import MDS
 import matplotlib.pyplot as plt
 from scipy import stats
 import numpy as np
 
-def calculateKSMatrix(gen_dist, hu_dist):
-    dist = gen_dist + hu_dist
+class GraphType:
+    
+    # init with path contrain files and number of files to read reader is imported from (readCSV)
+    def __init__(self, path, number, name):
+        self.out_ds = []
+        self.nas = []
+        self.mpcs = []
+        self.name = name
+        models = reader.readmultiplefiles(path, number)
+        for i in range(len(models)):
+            out_d, na, mpc = reader.getmetrics(models[i])
+            self.out_ds.append(out_d)
+            self.nas.append(na)
+            self.mpcs.append(mpc)
+
+def calculateKSMatrix(dists):
+    dist = []
+
+    for i in range(len(dists)):
+        dist = dist + dists[i]
     matrix = np.empty((len(dist),len(dist)))
 
     for i in range(len(dist)):
@@ -15,62 +34,70 @@ def calculateKSMatrix(gen_dist, hu_dist):
             value, p = stats.ks_2samp(dist[i], dist[j])
             matrix[i, j] = value
             matrix[j, i] = value
+            value, p = stats.ks_2samp(dist[j], dist[i])
     return matrix
+
 
 def calculateMDS(dissimilarities):
     embedding = MDS(n_components=2, dissimilarity='precomputed')
     trans = embedding.fit_transform(X=dissimilarities)
     return trans
 
-def plot(gen_name, hu_name, coords, index = 0, title=''):
-    half_length = int(coords.shape[0] / 2)
-    x = (coords[:half_length,0]).tolist()
-    y = (coords[:half_length,1]).tolist()
-
-    x2 = (coords[half_length:,0]).tolist()
-    y2 = (coords[half_length:,1]).tolist()
-    g = plt.figure(index)
+def plot(graphTypes, coords, title='', savePath = ''):
+    half_length = int(coords.shape[0] / len(graphTypes))
+    color = ['blue', 'red', 'green']
+    graph = plt.figure(0)
     plt.title(title)
-    plt.plot(x, y, 'yo', label = gen_name)
-    plt.plot(x2, y2, 'ro', label = hu_name)
+    for i in range(len(graphTypes)):
+        x = (coords[(i*half_length):((i+1)*half_length), 0].tolist())
+        y = (coords[(i*half_length):((i+1)*half_length), 1].tolist())
+        plt.plot(x, y, color=color[i], marker='o', label = graphTypes[i].name, linestyle='', alpha=0.7)
     plt.legend(loc='upper right')
-    plt.savefig(fname = title+'.png', dpi=150)
-    g.show()
+    plt.savefig(fname = savePath, dpi=150)
+    #graph.show()
+
+def mkdir_p(mypath):
+    '''Creates a directory. equivalent to using mkdir -p on the command line'''
+
+    from errno import EEXIST
+    from os import makedirs,path
+
+    try:
+        makedirs(mypath)
+    except OSError as exc: # Python >2.5
+        if exc.errno == EEXIST and path.isdir(mypath):
+            pass
+        else: raise
+
+def metricStat(graphTypes, metricName, metric):
+    metrics = []
+    foldName = '../output/'
+    for graph in graphTypes:
+        metrics.append(metric(graph))
+        foldName = foldName + graph.name + '-'
+    print('calculate' + metricName +' for ' + foldName)
+    mkdir_p(foldName)
+    out_d_coords = calculateMDS(calculateKSMatrix(metrics))
+    plot(graphTypes, out_d_coords, metricName, foldName + '/'+ metricName+'.png')
+
+def nodeActivity(graphType):
+    return graphType.nas
+
+def outDegree(graphType):
+    return graphType.out_ds
+
+def mpc(graphType):
+    return graphType.mpc
 
 
-#read models
-generatedModels = reader.readmultiplefiles('../viatraOutput/', 500)
+# read models
+human = GraphType('../statistics/humanOutput/', 500, 'Human')
+viatra30 = GraphType('../statistics/viatraOutput30/', 500, 'Viatra (30 nodes)')
+viatra100 = GraphType('../statistics/viatraOutput100/', 500, 'Viatra (100 nodes)')
+random = GraphType('../statistics/randomOutput/', 500, 'Random')
+alloy = GraphType('../statistics/alloyOutput/', 500, 'Alloy (30 nodes)')
 
-gen_out_ds = []
-gen_nas = []
-gen_mpcs = []
-
-for i in range(len(generatedModels)):
-    gen_out_d, gen_na, gen_mpc = reader.getmetrics(generatedModels[i])
-    gen_out_ds.append(gen_out_d)
-    gen_nas.append(gen_na)
-    gen_mpcs.append(gen_mpc)
-
-humanModels = reader.readmultiplefiles('../output/', 500)
-hu_out_ds = []
-hu_nas = []
-hu_mpcs = []
-for i in range(len(humanModels)):
-    hu_out_d, hu_na, hu_mpc = reader.getmetrics(humanModels[i])
-    hu_out_ds.append(hu_out_d)
-    hu_nas.append(hu_na)
-    hu_mpcs.append(hu_mpc)
-
-
-print('Calculating for out degree\n')
-out_d_coords = calculateMDS(calculateKSMatrix(gen_out_ds, hu_out_ds))
-plot('Generated Out Degree', 'Human Out Degree', out_d_coords,0, 'Out Degree')
-
-print('Calculating for node activity\n')
-out_d_coords = calculateMDS(calculateKSMatrix(gen_nas, hu_nas))
-plot('Generated Node Activity', 'Human Node Activity', out_d_coords,1, 'Node Activity')
-
-print('Calculating for MPC')
-out_d_coords = calculateMDS(calculateKSMatrix(gen_mpcs, hu_mpcs))
-plot('Generated MPC', 'Human MPC', out_d_coords,2, 'MPC')
-input()
+#calculate metrics
+metricStat([human, viatra30, random], 'Node Activity', nodeActivity)
+metricStat([human, viatra30, random], 'Out Degree', outDegree)
+metricStat([human, viatra30, random], 'MPC', mpc)

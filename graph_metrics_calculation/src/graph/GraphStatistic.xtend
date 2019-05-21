@@ -18,7 +18,10 @@ class GraphStatistic {
 	 * Add an edge type to to the graph
 	 * @param type: type to add
 	 */
-	private def void addType(String type){
+	def void addType(String type){
+		if(edgeTypes.contains(type)){
+	  		return;
+	  	}
 		edgeTypes.add(type);
 		incomingEdges.put(type, ArrayListMultimap.create());
 		outcomingEdges.put(type, ArrayListMultimap.create());
@@ -43,10 +46,6 @@ class GraphStatistic {
 	  * @param type: type of the reference
 	  */
 	  def void addEdge(EObject source, EObject target, String type){
-	  	if(!edgeTypes.contains(type)){
-	  		addType(type);
-	  	}
-	  	
 	  	outcomingEdges.get(type).put(source, target);
 	  	incomingEdges.get(type).put(target, source);
 	  }

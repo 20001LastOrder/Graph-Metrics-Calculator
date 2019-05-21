@@ -22,7 +22,11 @@ public class GraphStatistic {
    * Add an edge type to to the graph
    * @param type: type to add
    */
-  private void addType(final String type) {
+  public void addType(final String type) {
+    boolean _contains = this.edgeTypes.contains(type);
+    if (_contains) {
+      return;
+    }
     this.edgeTypes.add(type);
     this.incomingEdges.put(type, ArrayListMultimap.<EObject, EObject>create());
     this.outcomingEdges.put(type, ArrayListMultimap.<EObject, EObject>create());
@@ -47,11 +51,6 @@ public class GraphStatistic {
    * @param type: type of the reference
    */
   public void addEdge(final EObject source, final EObject target, final String type) {
-    boolean _contains = this.edgeTypes.contains(type);
-    boolean _not = (!_contains);
-    if (_not) {
-      this.addType(type);
-    }
     this.outcomingEdges.get(type).put(source, target);
     this.incomingEdges.get(type).put(target, source);
   }

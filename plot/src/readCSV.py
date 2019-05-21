@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
 import glob
-
+import random
 
 #
 # read csvfile returns outdegree, node activity, mpc
@@ -27,11 +27,19 @@ def readcsvfile(filename):
                               usecols=range(1, naCols))
     mpc = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=7, skip_footer=0,
                               usecols=range(1, mpcCols))
+    na = checkAndReshape(na)
+    mpc = checkAndReshape(mpc)
+    outdegree = checkAndReshape(outdegree)
+    
     # print(outdegree)
     # print(na)
     # print(mpc)
     return outdegree, na, mpc
 
+def checkAndReshape(arr):
+    if len(arr.shape) < 2:
+        arr = np.reshape(arr, (arr.shape[0],1))
+    return arr
 
 #
 # take a matrix as input
@@ -60,10 +68,11 @@ def getmetrics(filename):
 
 
 #
-# read number of files in the given path
+# read number of files in the given path RANDOMLY
 #
 def readmultiplefiles(dirName, numberOfFiles):
     list_of_files = glob.glob(dirName + '*.csv')  # create the list of file
+    random.shuffle(list_of_files)
     file_names = list_of_files[:numberOfFiles]
     # print(file_names)
     return file_names
@@ -74,7 +83,7 @@ def plotlines(x, y, ax):
 
 
 def testgetsamplesfromfiles():
-    files = readmultiplefiles('../viatraOutput/', 2)
+    files = readmultiplefiles('../statistics/viatraOutput/', 2)
     for file in files:
         getmetrics(file)
 
@@ -100,7 +109,7 @@ def plot():
     fig, ax3 = plt.subplots()
     fig, ax4 = plt.subplots()
     fig, ax5 = plt.subplots()
-    list_of_files = readmultiplefiles('../viatraOutput/')
+    list_of_files = readmultiplefiles('../statistics/iatraOutput/')
     for file_name in list_of_files:
         outdegree, na, mpc = readcsvfile(file_name)
         outV = outdegree[0, :]

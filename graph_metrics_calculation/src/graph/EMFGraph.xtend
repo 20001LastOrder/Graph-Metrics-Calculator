@@ -12,25 +12,37 @@ class EMFGraph {
 	var List<Metric> metrics;
 	var String name;
 	var String metaModel;
-	var EObject root;
 	
 	static val String META_MODEL_HEADER = "Meta Mode"
 	static val String NUM_NODE_HEADER = "Number Of Nodes";
 	static val String NUM_EDGE_TYPE_HEADER = "Number of Edge types"; 
 	
 	
-	def void init(EObject root, List<Metric> metrics, String name){
+	def void init(EObject root, List<Metric> metrics, String name, List<EReference> referenceTypes){
 		val otherContents = root.eAllContents.toList();
-		init(otherContents, metrics, name);
+		otherContents.add(root);
+		init(otherContents, metrics, name, referenceTypes);
 	}
 	
-	def void init(List<EObject> objects, List<Metric> metrics, String name){
+	/**
+	 * init the graph with all nodes and reference types in the meta model
+	 * @param objects: objects in the instance model (exclude root)
+	 * @param metrics: metrics to be evaluated
+	 * @param name: name of the instance model
+	 * @param ReferenceTypes: reference types defined in the meta model
+	 */
+	def void init(List<EObject> objects, List<Metric> metrics, String name, List<EReference> referenceTypes){
 		objects.forEach[it|
 			statistic.addNode(it);
 		]
 		
+		referenceTypes.forEach[it|
+			statistic.addType(it.name);
+		];
+		
 		objects.forEach[source|
 			source.eClass.EAllReferences.forEach[r|
+				//add the type first (if it is not added already)
 				//many references
 				if(r.isMany){
 					source.getNeighbours(r).forEach[target|
@@ -48,7 +60,11 @@ class EMFGraph {
 		this.name = name;
 	}
 	
-	def evaluateAllMetrics(){
+	/**
+	 * evaluate all metrics for this model
+	 * return the result as a two dimentional list
+	 */
+	def ArrayList<ArrayList<String>> evaluateAllMetrics(){
 		val result = new ArrayList<ArrayList<String>>();
 		setBasicInformation(result);
 		
@@ -61,6 +77,9 @@ class EMFGraph {
 		return result;
 	}
 	
+	/**
+	 * Set basic information for the output
+	 */
 	private def setBasicInformation(ArrayList<ArrayList<String>> output){
 		val metaInfo = new ArrayList<String>();
 		metaInfo.add(META_MODEL_HEADER);
