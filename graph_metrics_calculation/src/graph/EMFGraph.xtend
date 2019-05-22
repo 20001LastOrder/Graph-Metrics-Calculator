@@ -7,18 +7,9 @@ import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 
-class EMFGraph {
-	val statistic = new GraphStatistic();
-	var List<Metric> metrics;
-	var String name;
-	var String metaModel;
+class EMFGraph extends Graph{	
 	
-	static val String META_MODEL_HEADER = "Meta Mode"
-	static val String NUM_NODE_HEADER = "Number Of Nodes";
-	static val String NUM_EDGE_TYPE_HEADER = "Number of Edge types"; 
-	
-	
-	def void init(EObject root, List<Metric> metrics, String name, List<EReference> referenceTypes){
+	def void init (EObject root, List<Metric> metrics, String name, List<String> referenceTypes){
 		val otherContents = root.eAllContents.toList();
 		otherContents.add(root);
 		init(otherContents, metrics, name, referenceTypes);
@@ -31,13 +22,13 @@ class EMFGraph {
 	 * @param name: name of the instance model
 	 * @param ReferenceTypes: reference types defined in the meta model
 	 */
-	def void init(List<EObject> objects, List<Metric> metrics, String name, List<EReference> referenceTypes){
+	def void init(List<EObject> objects, List<Metric> metrics, String name, List<String> referenceTypes){
 		objects.forEach[it|
 			statistic.addNode(it);
 		]
 		
 		referenceTypes.forEach[it|
-			statistic.addType(it.name);
+			statistic.addType(it);
 		];
 		
 		objects.forEach[source|
@@ -61,26 +52,9 @@ class EMFGraph {
 	}
 	
 	/**
-	 * evaluate all metrics for this model
-	 * return the result as a two dimentional list
-	 */
-	def ArrayList<ArrayList<String>> evaluateAllMetrics(){
-		val result = new ArrayList<ArrayList<String>>();
-		setBasicInformation(result);
-		
-		for(metric : this.metrics){
-			val datas = metric.evaluate(this.statistic);
-			for(row : datas){
-				result.add(new ArrayList<String>(row));
-			}
-		}
-		return result;
-	}
-	
-	/**
 	 * Set basic information for the output
 	 */
-	private def setBasicInformation(ArrayList<ArrayList<String>> output){
+   override setBasicInformation(ArrayList<ArrayList<String>> output){
 		val metaInfo = new ArrayList<String>();
 		metaInfo.add(META_MODEL_HEADER);
 		metaInfo.add(this.metaModel);
@@ -108,11 +82,11 @@ class EMFGraph {
 		}
 	}
 	
-	def GraphStatistic getStatistic(){
+	override GraphStatistic getStatistic(){
 		return this.statistic;
 	}
 	
-	def String getName(){
+	override String getName(){
 		return this.name;
 	}
 	

@@ -1,25 +1,10 @@
-import readCSV as reader
 import glob
 import random 
 from sklearn.manifold import MDS
 import matplotlib.pyplot as plt
 from scipy import stats
 import numpy as np
-
-class GraphType:
-    
-    # init with path contrain files and number of files to read reader is imported from (readCSV)
-    def __init__(self, path, number, name):
-        self.out_ds = []
-        self.nas = []
-        self.mpcs = []
-        self.name = name
-        models = reader.readmultiplefiles(path, number)
-        for i in range(len(models)):
-            out_d, na, mpc = reader.getmetrics(models[i])
-            self.out_ds.append(out_d)
-            self.nas.append(na)
-            self.mpcs.append(mpc)
+from GraphType import GraphType
 
 def calculateKSMatrix(dists):
     dist = []
@@ -45,13 +30,14 @@ def calculateMDS(dissimilarities):
 
 def plot(graphTypes, coords, title='',index = 0, savePath = ''):
     half_length = int(coords.shape[0] / len(graphTypes))
-    color = ['blue', 'red', 'green']
-    plt.figure(index)
+    color = ['blue', 'red', 'green', 'yellow']
+    lineStyle = ['', '-']
+    plt.figure(index, figsize=(7, 4))
     plt.title(title)
     for i in range(len(graphTypes)):
         x = (coords[(i*half_length):((i+1)*half_length), 0].tolist())
         y = (coords[(i*half_length):((i+1)*half_length), 1].tolist())
-        plt.plot(x, y, color=color[i], marker='o', label = graphTypes[i].name, linestyle='', alpha=0.7)
+        plt.plot(x, y, color=color[i], marker='o', label = graphTypes[i].name, linestyle=lineStyle[i], alpha=0.7)
     plt.legend(loc='upper right')
     plt.savefig(fname = savePath, dpi=150)
     #graph.show()
@@ -92,12 +78,14 @@ def mpc(graphType):
 
 # read models
 human = GraphType('../statistics/humanOutput/', 500, 'Human')
-viatra30 = GraphType('../statistics/viatraOutput30/', 500, 'Viatra (30 nodes)')
-viatra100 = GraphType('../statistics/viatraOutput100/', 500, 'Viatra (100 nodes)')
-random = GraphType('../statistics/randomOutput/', 500, 'Random')
-alloy = GraphType('../statistics/alloyOutput/', 500, 'Alloy (30 nodes)')
+# viatra30 = GraphType('../statistics/viatraOutput30/', 500, 'Viatra (30 nodes)')
+# viatra60 = GraphType('../statistics/viatraOutput60/', 500, 'Viatra (60 nodes)')
+# viatra100 = GraphType('../statistics/viatraOutput100/', 500, 'Viatra (100 nodes)')
+# random = GraphType('../statistics/randomOutput/', 500, 'Random')
+# alloy = GraphType('../statistics/alloyOutput/', 500, 'Alloy (30 nodes)')
+viatraEvolve = GraphType('../statistics/viatraEvolve/', 130, 'viatraEvolve', shouldShuffle = False)
 
 #calculate metrics
-# metricStat([human, viatra30, random], 'Node Activity', nodeActivity, 0)
-metricStat([human, viatra30, random], 'Out Degree', outDegree, 1)
-metricStat([human, viatra30, random], 'MPC', mpc, 2)
+metricStat([human, viatraEvolve], 'Node Activity', nodeActivity, 0)
+metricStat([human, viatraEvolve], 'Out Degree', outDegree, 1)
+metricStat([human, viatraEvolve], 'MPC', mpc, 2)

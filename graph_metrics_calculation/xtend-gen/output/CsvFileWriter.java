@@ -27,9 +27,13 @@ public class CsvFileWriter {
             output.append(_plus);
           }
           int _size_1 = datarow.size();
-          int _minus = (_size_1 - 1);
-          output.append(datarow.get(_minus));
-          output.append("\n");
+          boolean _greaterThan = (_size_1 > 1);
+          if (_greaterThan) {
+            int _size_2 = datarow.size();
+            int _minus = (_size_2 - 1);
+            output.append(datarow.get(_minus));
+            output.append("\n");
+          }
         }
       }
       writer.write(output.toString());

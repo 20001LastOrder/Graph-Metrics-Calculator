@@ -1,0 +1,40 @@
+package graph
+
+import java.util.ArrayList
+import java.util.List
+import metrics.Metric
+
+abstract class Graph {
+	
+	protected static val String META_MODEL_HEADER = "Meta Mode"
+	protected static val String NUM_NODE_HEADER = "Number Of Nodes";
+	protected static val String NUM_EDGE_TYPE_HEADER = "Number of Edge types"; 
+	
+	protected val statistic = new GraphStatistic();
+	protected var List<Metric> metrics;
+	protected var String name = "";
+	protected var String metaModel = "";
+	
+	/**
+	 * evaluate all metrics for this model
+	 * return the result as a two dimentional list
+	 */
+	def ArrayList<ArrayList<String>> evaluateAllMetrics(){
+		val result = new ArrayList<ArrayList<String>>();
+		setBasicInformation(result);
+		
+		for(metric : this.metrics){
+			val datas = metric.evaluate(this.statistic);
+			for(row : datas){
+				result.add(new ArrayList<String>(row));
+			}
+		}
+		return result;
+	}	
+	
+	def void setBasicInformation(ArrayList<ArrayList<String>> result);
+	
+	def GraphStatistic getStatistic();
+	
+	def String getName();
+}

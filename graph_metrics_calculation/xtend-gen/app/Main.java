@@ -6,8 +6,6 @@ import input.GraphReader;
 import java.util.ArrayList;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import output.CsvFileWriter;
-import socialnetwork.impl.SocialnetworkPackageImpl;
-import yakindumm2.impl.Yakindumm2PackageImpl;
 
 @SuppressWarnings("all")
 public class Main {
@@ -26,17 +24,13 @@ public class Main {
   }
   
   public static void main(final String[] args) {
-    SocialnetworkPackageImpl.eINSTANCE.eClass();
     YakindummPackageImpl.eINSTANCE.eClass();
-    Yakindumm2PackageImpl.eINSTANCE.eClass();
     final ArrayList<Main.RWInformation> infos = Main.initData();
     InputOutput.<String>println("Start Reading Models...");
     GraphReader reader = new GraphReader(YakindummPackageImpl.eINSTANCE);
     for (final Main.RWInformation info : infos) {
       Main.calculateAllModels(info.inputFolder, info.outputFolder, info.numRuns, reader);
     }
-    GraphReader _graphReader = new GraphReader(Yakindumm2PackageImpl.eINSTANCE);
-    reader = _graphReader;
     final Main.RWInformation human = new Main.RWInformation("inputs/humanInput/", "../plot/statistics/humanOutput/", 1);
     Main.calculateAllModels(human.inputFolder, human.outputFolder, human.numRuns, reader);
     InputOutput.<String>println("finished");

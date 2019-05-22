@@ -12,6 +12,8 @@ def readcsvfile(filename):
     # print(filename)
     with open(filename) as f:
         for i, line in enumerate(f):
+            # if i == 1:
+            #     num
             if i == 2:
                 outDegreeCols = len(f.readline().split(','))
             if i == 4:
@@ -20,7 +22,7 @@ def readcsvfile(filename):
                 mpcCols = len(f.readline().split(','))
 
     f.close()
-    # print(outDegreeCols, naCols, mpcCols)
+    #print(outDegreeCols, naCols, mpcCols)
 
     outdegree = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=3, skip_footer=4, usecols=range(1, outDegreeCols))
     na = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=5, skip_footer=2,
@@ -34,7 +36,7 @@ def readcsvfile(filename):
     # print(outdegree)
     # print(na)
     # print(mpc)
-    return outdegree, na, mpc
+    return (outdegree, na, mpc)
 
 def checkAndReshape(arr):
     if len(arr.shape) < 2:
@@ -70,9 +72,10 @@ def getmetrics(filename):
 #
 # read number of files in the given path RANDOMLY
 #
-def readmultiplefiles(dirName, numberOfFiles):
+def readmultiplefiles(dirName, numberOfFiles, shouldShuffle = True):
     list_of_files = glob.glob(dirName + '*.csv')  # create the list of file
-    random.shuffle(list_of_files)
+    if shouldShuffle: 
+        random.shuffle(list_of_files)
     file_names = list_of_files[:numberOfFiles]
     # print(file_names)
     return file_names

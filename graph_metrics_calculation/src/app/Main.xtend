@@ -5,8 +5,7 @@ import hu.bme.mit.inf.dslreasoner.domains.yakindu.sgraph.yakindumm.impl.Yakindum
 import input.GraphReader
 import java.util.ArrayList
 import output.CsvFileWriter
-import socialnetwork.impl.SocialnetworkPackageImpl
-import yakindumm2.impl.Yakindumm2PackageImpl
+//import yakindumm2.impl.Yakindumm2PackageImpl
 
 class Main {
 	static class RWInformation{
@@ -23,9 +22,8 @@ class Main {
 	
 	def static void main(String[] args){
 		//init model
-		SocialnetworkPackageImpl.eINSTANCE.eClass;
 		YakindummPackageImpl.eINSTANCE.eClass;
-		Yakindumm2PackageImpl.eINSTANCE.eClass;
+//		Yakindumm2PackageImpl.eINSTANCE.eClass;
 		val infos = initData();									
 										
 		println("Start Reading Models...");
@@ -35,7 +33,7 @@ class Main {
 		}
 		
 		//human input has different package declaration
-		reader = new GraphReader(Yakindumm2PackageImpl.eINSTANCE);
+//		reader = new GraphReader(Yakindumm2PackageImpl.eINSTANCE);
 		val human = new RWInformation("inputs/humanInput/", "../plot/statistics/humanOutput/", 1);
 		calculateAllModels(human.inputFolder, human.outputFolder,human.numRuns, reader);
 		

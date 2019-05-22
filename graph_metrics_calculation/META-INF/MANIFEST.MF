@@ -13,4 +13,5 @@ Require-Bundle: com.google.guava,
  org.eclipse.emf.ecore.xmi;bundle-version="2.15.0",
  hu.bme.mit.inf.dslreasoner.viatra2logic;bundle-version="1.0.0",
  hu.bme.mit.inf.dslreasoner.domains.yakindu.sgraph;bundle-version="1.0.0",
- SocialNetwork_plugin;bundle-version="1.0.0"
+ hu.bme.mit.inf.dslreasoner.viatrasolver.partialinterpretationlanguage;bundle-version="1.0.0"
+Export-Package: app

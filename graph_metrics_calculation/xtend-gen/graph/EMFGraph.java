@@ -1,34 +1,19 @@
 package graph;
 
+import graph.Graph;
 import graph.GraphStatistic;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import metrics.Metric;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.IteratorExtensions;
 
 @SuppressWarnings("all")
-public class EMFGraph {
-  private final GraphStatistic statistic = new GraphStatistic();
-  
-  private List<Metric> metrics;
-  
-  private String name;
-  
-  private String metaModel;
-  
-  private static final String META_MODEL_HEADER = "Meta Mode";
-  
-  private static final String NUM_NODE_HEADER = "Number Of Nodes";
-  
-  private static final String NUM_EDGE_TYPE_HEADER = "Number of Edge types";
-  
-  public void init(final EObject root, final List<Metric> metrics, final String name, final List<EReference> referenceTypes) {
+public class EMFGraph extends Graph {
+  public void init(final EObject root, final List<Metric> metrics, final String name, final List<String> referenceTypes) {
     final List<EObject> otherContents = IteratorExtensions.<EObject>toList(root.eAllContents());
     otherContents.add(root);
     this.init(otherContents, metrics, name, referenceTypes);
@@ -41,13 +26,13 @@ public class EMFGraph {
    * @param name: name of the instance model
    * @param ReferenceTypes: reference types defined in the meta model
    */
-  public void init(final List<EObject> objects, final List<Metric> metrics, final String name, final List<EReference> referenceTypes) {
+  public void init(final List<EObject> objects, final List<Metric> metrics, final String name, final List<String> referenceTypes) {
     final Consumer<EObject> _function = (EObject it) -> {
       this.statistic.addNode(it);
     };
     objects.forEach(_function);
-    final Consumer<EReference> _function_1 = (EReference it) -> {
-      this.statistic.addType(it.getName());
+    final Consumer<String> _function_1 = (String it) -> {
+      this.statistic.addType(it);
     };
     referenceTypes.forEach(_function_1);
     final Consumer<EObject> _function_2 = (EObject source) -> {
@@ -72,48 +57,26 @@ public class EMFGraph {
   }
   
   /**
-   * evaluate all metrics for this model
-   * return the result as a two dimentional list
-   */
-  public ArrayList<ArrayList<String>> evaluateAllMetrics() {
-    final ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
-    this.setBasicInformation(result);
-    for (final Metric metric : this.metrics) {
-      {
-        final String[][] datas = metric.evaluate(this.statistic);
-        for (final String[] row : datas) {
-          ArrayList<String> _arrayList = new ArrayList<String>((Collection<? extends String>)Conversions.doWrapArray(row));
-          result.add(_arrayList);
-        }
-      }
-    }
-    return result;
-  }
-  
-  /**
    * Set basic information for the output
    */
-  private boolean setBasicInformation(final ArrayList<ArrayList<String>> output) {
-    boolean _xblockexpression = false;
-    {
-      final ArrayList<String> metaInfo = new ArrayList<String>();
-      metaInfo.add(EMFGraph.META_MODEL_HEADER);
-      metaInfo.add(this.metaModel);
-      final ArrayList<String> edgeInfo = new ArrayList<String>();
-      edgeInfo.add(EMFGraph.NUM_EDGE_TYPE_HEADER);
-      int _size = this.statistic.getAllTypes().size();
-      String _plus = (Integer.valueOf(_size) + "");
-      edgeInfo.add(_plus);
-      final ArrayList<String> nodeInfo = new ArrayList<String>();
-      nodeInfo.add(EMFGraph.NUM_NODE_HEADER);
-      int _size_1 = this.statistic.getAllNodes().size();
-      String _plus_1 = (Integer.valueOf(_size_1) + "");
-      nodeInfo.add(_plus_1);
-      output.add(metaInfo);
-      output.add(edgeInfo);
-      _xblockexpression = output.add(nodeInfo);
-    }
-    return _xblockexpression;
+  @Override
+  public void setBasicInformation(final ArrayList<ArrayList<String>> output) {
+    final ArrayList<String> metaInfo = new ArrayList<String>();
+    metaInfo.add(Graph.META_MODEL_HEADER);
+    metaInfo.add(this.metaModel);
+    final ArrayList<String> edgeInfo = new ArrayList<String>();
+    edgeInfo.add(Graph.NUM_EDGE_TYPE_HEADER);
+    int _size = this.statistic.getAllTypes().size();
+    String _plus = (Integer.valueOf(_size) + "");
+    edgeInfo.add(_plus);
+    final ArrayList<String> nodeInfo = new ArrayList<String>();
+    nodeInfo.add(Graph.NUM_NODE_HEADER);
+    int _size_1 = this.statistic.getAllNodes().size();
+    String _plus_1 = (Integer.valueOf(_size_1) + "");
+    nodeInfo.add(_plus_1);
+    output.add(metaInfo);
+    output.add(edgeInfo);
+    output.add(nodeInfo);
   }
   
   public EList<EObject> getNeighbours(final EObject o, final EReference r) {
@@ -127,10 +90,12 @@ public class EMFGraph {
     }
   }
   
+  @Override
   public GraphStatistic getStatistic() {
     return this.statistic;
   }
   
+  @Override
   public String getName() {
     return this.name;
   }

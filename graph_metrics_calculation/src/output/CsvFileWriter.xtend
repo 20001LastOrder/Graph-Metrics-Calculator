@@ -20,8 +20,11 @@ class CsvFileWriter {
 				for(var i = 0; i < datarow.size() - 1; i++){
 					output.append(datarow.get(i) + ',');
 				}
-				output.append(datarow.get(datarow.size() - 1));
-				output.append('\n');
+				
+				if(datarow.size > 1){
+					output.append(datarow.get(datarow.size() - 1));
+					output.append('\n');
+				}
 			}
 			
 			writer.write(output.toString());

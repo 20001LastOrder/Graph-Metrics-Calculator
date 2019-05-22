@@ -20,7 +20,7 @@ import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl
 
 class GraphReader{
 	val ResourceSet resSet = new ResourceSetImpl();
-	val referenceTypes = new ArrayList<EReference>();
+	val referenceTypes = new ArrayList<String>();
 	
 	new(EPackage metaModel) {
 		Resource.Factory.Registry.INSTANCE.extensionToFactoryMap.put("*",new XMIResourceFactoryImpl)
@@ -28,7 +28,7 @@ class GraphReader{
 		//find all reference types in the meta model
 		metaModel.eAllContents.forEach[
 			if(it instanceof EReference){
-				referenceTypes.add(it);
+				referenceTypes.add(it.name);
 			}
 		]
 	}

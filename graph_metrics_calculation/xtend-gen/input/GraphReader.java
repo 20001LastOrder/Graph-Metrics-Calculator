@@ -30,7 +30,7 @@ import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
 public class GraphReader {
   private final ResourceSet resSet = new ResourceSetImpl();
   
-  private final ArrayList<EReference> referenceTypes = new ArrayList<EReference>();
+  private final ArrayList<String> referenceTypes = new ArrayList<String>();
   
   public GraphReader(final EPackage metaModel) {
     Map<String, Object> _extensionToFactoryMap = Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap();
@@ -38,7 +38,7 @@ public class GraphReader {
     _extensionToFactoryMap.put("*", _xMIResourceFactoryImpl);
     final Procedure1<EObject> _function = (EObject it) -> {
       if ((it instanceof EReference)) {
-        this.referenceTypes.add(((EReference)it));
+        this.referenceTypes.add(((EReference)it).getName());
       }
     };
     IteratorExtensions.<EObject>forEach(metaModel.eAllContents(), _function);
