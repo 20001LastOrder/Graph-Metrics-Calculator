@@ -62,9 +62,13 @@ public class PartialInterpretationGraph extends Graph {
     int _size_1 = this.statistic.getAllNodes().size();
     String _plus_1 = (Integer.valueOf(_size_1) + "");
     nodeInfo.add(_plus_1);
+    final ArrayList<String> stateInfo = new ArrayList<String>();
+    stateInfo.add(Graph.STATE_ID_HEADER);
+    stateInfo.add(this.name);
     output.add(metaInfo);
     output.add(edgeInfo);
     output.add(nodeInfo);
+    output.add(stateInfo);
   }
   
   private Iterable<DefinedElement> getElements(final PartialInterpretation partial) {

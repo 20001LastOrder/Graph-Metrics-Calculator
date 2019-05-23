@@ -15,6 +15,8 @@ public abstract class Graph {
   
   protected static final String NUM_EDGE_TYPE_HEADER = "Number of Edge types";
   
+  protected static final String STATE_ID_HEADER = "State Id";
+  
   protected final GraphStatistic statistic = new GraphStatistic();
   
   protected List<Metric> metrics;
