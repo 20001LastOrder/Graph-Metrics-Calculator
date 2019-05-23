@@ -9,6 +9,7 @@ abstract class Graph {
 	protected static val String META_MODEL_HEADER = "Meta Mode"
 	protected static val String NUM_NODE_HEADER = "Number Of Nodes";
 	protected static val String NUM_EDGE_TYPE_HEADER = "Number of Edge types"; 
+	protected static val String STATE_ID_HEADER = "State Id";
 	
 	protected val statistic = new GraphStatistic();
 	protected var List<Metric> metrics;

@@ -12,7 +12,7 @@ import output.CsvFileWriter;
 
 @SuppressWarnings("all")
 public class PartialInterpretationMetric {
-  public static void calculateMetric(final PartialInterpretation partial, final String path, final int id) {
+  public static void calculateMetric(final PartialInterpretation partial, final String path, final int id, final String currentStateId) {
     final ArrayList<Metric> metrics = new ArrayList<Metric>();
     OutDegreeMetric _outDegreeMetric = new OutDegreeMetric();
     metrics.add(_outDegreeMetric);
@@ -22,7 +22,7 @@ public class PartialInterpretationMetric {
     metrics.add(_multiplexParticipationCoefficientMetric);
     new File(path).mkdir();
     final String filename = (((path + "/state_") + Integer.valueOf(id)) + ".csv");
-    final PartialInterpretationGraph metricCalculator = new PartialInterpretationGraph(partial, metrics, "name");
+    final PartialInterpretationGraph metricCalculator = new PartialInterpretationGraph(partial, metrics, currentStateId);
     CsvFileWriter.write(metricCalculator.evaluateAllMetrics(), filename);
   }
 }

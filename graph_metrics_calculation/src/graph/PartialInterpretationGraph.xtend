@@ -48,9 +48,14 @@ class PartialInterpretationGraph extends Graph{
 		nodeInfo.add(NUM_NODE_HEADER);
 		nodeInfo.add(this.statistic.allNodes.size()+"");
 		
+		val stateInfo = new ArrayList<String>();
+		stateInfo.add(STATE_ID_HEADER);
+		stateInfo.add(this.name);
+		
 		output.add(metaInfo);
 		output.add(edgeInfo);
 		output.add(nodeInfo);
+		output.add(stateInfo);
 	}
 	
 	private def getElements(PartialInterpretation partial){
