@@ -3,40 +3,32 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import glob
 import random
+import constants
 
 #
 # read csvfile returns outdegree, node activity, mpc
 # as matrix with the first row of values and second row of count
 #
 def readcsvfile(filename):
-    # print(filename)
+    
+    contents = {}
     with open(filename) as f:
         for i, line in enumerate(f):
-            # if i == 1:
-            #     num
-            if i == 2:
-                outDegreeCols = len(f.readline().split(','))
-            if i == 4:
-                naCols = len(f.readline().split(','))
-            if i == 5:
-                mpcCols = len(f.readline().split(','))
-
+            arr = line.split(',')
+            # if there is no element in the line, continue
+            if len(line) < 0: continue
+            # else check for contents
+            # if it is MPC then use float
+            if arr[0] == constants.MPC_VALUE:
+                contents[constants.MPC_VALUE] = list(map(float, arr[1:]))
+            # meta models are string
+            elif(arr[0] == constants.METAMODEL):
+                contents[constants.METAMODEL] = arr[1:]
+            # all other contants are integer
+            else:
+                contents[arr[0]] = list(map(int, arr[1:]))
     f.close()
-    #print(outDegreeCols, naCols, mpcCols)
-
-    outdegree = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=3, skip_footer=4, usecols=range(1, outDegreeCols))
-    na = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=5, skip_footer=2,
-                              usecols=range(1, naCols))
-    mpc = np.genfromtxt(open(filename, "rb"), delimiter=",", skip_header=7, skip_footer=0,
-                              usecols=range(1, mpcCols))
-    na = checkAndReshape(na)
-    mpc = checkAndReshape(mpc)
-    outdegree = checkAndReshape(outdegree)
-    
-    # print(outdegree)
-    # print(na)
-    # print(mpc)
-    return (outdegree, na, mpc)
+    return contents
 
 def checkAndReshape(arr):
     if len(arr.shape) < 2:
@@ -56,18 +48,20 @@ def getsample(dataMatrix):
             data.append(v)
     return data
 
+def reproduceSample(values, counts):
+    arr = np.array([values, counts])
+    return getsample(arr)
 
 #
 # take an array of filenames as input
 # return the samples of outdegree, na, mpc
 #
 def getmetrics(filename):
-    outdegree, na, mpc = readcsvfile(filename)
-    outdegree_sample = getsample(outdegree)
-    na_sample = getsample(na)
-    mpc_sample = getsample(mpc)
-    return outdegree_sample, na_sample, mpc_sample
-
+    contents = readcsvfile(filename)
+    outdegree_sample = reproduceSample(contents[constants.OUT_DEGREE_VALUE], contents[constants.OUT_DEGREE_COUNT])
+    na_sample = reproduceSample(contents[constants.NA_VALUE], contents[constants.NA_COUNT])
+    mpc_sample = reproduceSample(contents[constants.MPC_VALUE], contents[constants.MPC_COUNT])
+    return contents,outdegree_sample, na_sample, mpc_sample
 
 #
 # read number of files in the given path RANDOMLY
@@ -76,7 +70,8 @@ def readmultiplefiles(dirName, numberOfFiles, shouldShuffle = True):
     list_of_files = glob.glob(dirName + '*.csv')  # create the list of file
     if shouldShuffle: 
         random.shuffle(list_of_files)
-    file_names = list_of_files[:numberOfFiles]
+    #if the number of files is out of bound then just give the whole list
+    file_names =  list_of_files[:numberOfFiles] if numberOfFiles > len(list_of_files) else list_of_files
     # print(file_names)
     return file_names
 
@@ -114,7 +109,10 @@ def plot():
     fig, ax5 = plt.subplots()
     list_of_files = readmultiplefiles('../statistics/iatraOutput/')
     for file_name in list_of_files:
-        outdegree, na, mpc = readcsvfile(file_name)
+        contents = readcsvfile(file_name)
+        outdegree = [contents[constants.OUT_DEGREE_VALUE], contents[constants.OUT_DEGREE_COUNT]]
+        na = [contents[constants.NA_VALUE], contents[constants.NA_COUNT]]
+        mpc = [contents[constants.MPC_VALUE], contents[constants.MPC_COUNT]]
         outV = outdegree[0, :]
         outC = outdegree[1, :]
         outP = probability(outC)

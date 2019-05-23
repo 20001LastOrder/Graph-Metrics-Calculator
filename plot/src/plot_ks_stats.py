@@ -4,7 +4,7 @@ from sklearn.manifold import MDS
 import matplotlib.pyplot as plt
 from scipy import stats
 import numpy as np
-from GraphType import GraphType
+from GraphType import GraphCollection
 
 def calculateKSMatrix(dists):
     dist = []
@@ -19,7 +19,6 @@ def calculateKSMatrix(dists):
             value, p = stats.ks_2samp(dist[i], dist[j])
             matrix[i, j] = value
             matrix[j, i] = value
-            value, p = stats.ks_2samp(dist[j], dist[i])
     return matrix
 
 
@@ -77,13 +76,13 @@ def mpc(graphType):
 
 
 # read models
-human = GraphType('../statistics/humanOutput/', 500, 'Human')
-# viatra30 = GraphType('../statistics/viatraOutput30/', 500, 'Viatra (30 nodes)')
-# viatra60 = GraphType('../statistics/viatraOutput60/', 500, 'Viatra (60 nodes)')
-# viatra100 = GraphType('../statistics/viatraOutput100/', 500, 'Viatra (100 nodes)')
-# random = GraphType('../statistics/randomOutput/', 500, 'Random')
-# alloy = GraphType('../statistics/alloyOutput/', 500, 'Alloy (30 nodes)')
-viatraEvolve = GraphType('../statistics/viatraEvolve/', 130, 'viatraEvolve', shouldShuffle = False)
+human = GraphCollection('../statistics/humanOutput/', 500, 'Human')
+# viatra30 = GraphCollection('../statistics/viatraOutput30/', 500, 'Viatra (30 nodes)')
+# viatra60 = GraphCollection('../statistics/viatraOutput60/', 500, 'Viatra (60 nodes)')
+# viatra100 = GraphCollection('../statistics/viatraOutput100/', 500, 'Viatra (100 nodes)')
+# random = GraphCollection('../statistics/randomOutput/', 500, 'Random')
+# alloy = GraphCollection('../statistics/alloyOutput/', 500, 'Alloy (30 nodes)')
+viatraEvolve = GraphCollection('../statistics/viatraEvolve/', 130, 'viatraEvolve', shouldShuffle = False)
 
 #calculate metrics
 metricStat([human, viatraEvolve], 'Node Activity', nodeActivity, 0)
