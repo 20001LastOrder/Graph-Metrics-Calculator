@@ -35,6 +35,13 @@ def checkAndReshape(arr):
         arr = np.reshape(arr, (arr.shape[0],1))
     return arr
 
+def readTrajectory(filename):
+    state_codes = []
+    with open(filename) as f:
+        for i, line in enumerate(f):
+            if(line == ''): continue
+            state_codes.append(int(line))
+    return state_codes
 #
 # take a matrix as input
 # return the sample array

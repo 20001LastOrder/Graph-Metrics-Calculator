@@ -15,3 +15,5 @@ MPC_VALUE = 'MPCValue'
 MPC_COUNT = 'MPCCount'
 
 METAMODEL = 'Meta Mode'
+
+STATE_ID = 'State Id'

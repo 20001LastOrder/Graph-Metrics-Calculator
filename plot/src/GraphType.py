@@ -20,10 +20,8 @@ class GraphCollection:
 
 #Graph stat for one graph
 class GraphStat:
-    total_element = 0
     # init with teh file name of the stat
     def __init__(self, filename):
         contents, self.out_d, self.na, self.mpc = reader.getmetrics(filename)
         self.num_nodes = np.array(contents[constants.NUMBER_NODES])
-        self.id = GraphStat.total_element
-        GraphStat.total_element = GraphStat.total_element+1
+        self.id = (contents[constants.STATE_ID])[0]
